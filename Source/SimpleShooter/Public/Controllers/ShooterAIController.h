@@ -34,7 +34,7 @@ private:
  */
 	UPROPERTY(EditAnywhere)
 	UBehaviorTree* AIBehavior;
-
+	
 	bool bRunningAIBehavior;
 	
 };

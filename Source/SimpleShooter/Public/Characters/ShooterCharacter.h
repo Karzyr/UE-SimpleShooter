@@ -27,13 +27,19 @@ public:
 	void Die();
 	void HandleDamage(float DamageApplied);
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+/**
+ * Combat
+ */
+	// Functions
+	void Shoot();
 	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 /**
- *	Combat
+ * Combat
  */
 	// Variables
 	UPROPERTY(EditDefaultsOnly, Category = "Combat")
@@ -64,7 +70,6 @@ private:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void Aim();
-	void Shoot();
 	virtual void Jump() override;
 	
 	void SetupPlayerController();
@@ -84,7 +89,6 @@ private:
 	//Variables	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Combat", meta=(AllowPrivateAccess = "true"))
 	bool bAiming = false;
-
 
 /**
  * Attributes

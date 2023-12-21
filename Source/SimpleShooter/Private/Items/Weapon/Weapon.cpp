@@ -56,8 +56,10 @@ void AWeapon::PullTrigger()
 
 		const FVector Start = CameraLocation;
 		const FVector End = CameraLocation + CameraRotation.Vector() * MaxFiringRange;
-
-		bool bHit = World->LineTraceSingleByChannel(OutHit, Start, End, ECC_GameTraceChannel1);
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(this);
+		Params.AddIgnoredActor(GetOwner());
+		bool bHit = World->LineTraceSingleByChannel(OutHit, Start, End, ECC_GameTraceChannel1, Params);
 
 		if (bHit)
 		{
