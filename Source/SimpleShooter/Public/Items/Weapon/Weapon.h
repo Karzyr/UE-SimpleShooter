@@ -17,7 +17,9 @@ public:
 	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-/**
+	bool LineTraceSetup(UWorld* World, AController*& OwnerController, FRotator& CameraRotation, FHitResult& OutHit);
+	void HitActor(UWorld* World, AController* OwnerController, FRotator CameraRotation, FHitResult OutHit);
+	/**
  * Combat
  */
 	// Variables
@@ -53,4 +55,8 @@ private:
 	UParticleSystem* MuzzleFlash;
 	UPROPERTY(EditAnywhere, Category = "Combat Effects")
 	UParticleSystem* ImpactEffect;
+	UPROPERTY(EditAnywhere, Category = "Combat Effects")
+	USoundBase* MuzzleSound;
+	UPROPERTY(EditAnywhere, Category = "Combat Effects")
+	USoundBase* ImpactSound;
 };

@@ -14,7 +14,7 @@ void UBTService_PlayerLocation::TickNode(UBehaviorTreeComponent& OwnerComp, uint
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
 
-	const AActor* Player = Cast<AActor>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	AActor* Player = Cast<AActor>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 
 	if (Player)
 		OwnerComp.GetBlackboardComponent()->SetValueAsVector(GetSelectedBlackboardKey(), Player->GetActorLocation());

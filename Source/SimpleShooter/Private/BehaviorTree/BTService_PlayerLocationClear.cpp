@@ -19,10 +19,10 @@ void UBTService_PlayerLocationClear::TickNode(UBehaviorTreeComponent& OwnerComp,
 	AAIController* AIController = OwnerComp.GetAIOwner();
 	if (AIController)
 	{
-		const AActor* Player = Cast<AActor>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+		AActor* Player = Cast<AActor>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 
 		if (AIController->LineOfSightTo(Player))
-			OwnerComp.GetBlackboardComponent()->SetValueAsVector(GetSelectedBlackboardKey(), Player->GetActorLocation());
+			OwnerComp.GetBlackboardComponent()->SetValueAsObject(GetSelectedBlackboardKey(), Player);
 		else
 			OwnerComp.GetBlackboardComponent()->ClearValue(GetSelectedBlackboardKey());
 	}

@@ -21,7 +21,7 @@ class SIMPLESHOOTER_API AShooterCharacter : public ACharacter
 public:
 	void InitializeCamera();
 	AShooterCharacter();
-
+	
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	void Die();
@@ -33,6 +33,13 @@ public:
  */
 	// Functions
 	void Shoot();
+
+/**
+ * Attributes
+ */
+	//Variables 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attributes")
+	bool bIsDead = false;
 	
 protected:
 	// Called when the game starts or when spawned
@@ -99,7 +106,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Attributes")
 	float MaxHealth = 100.f;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attributes", meta=(AllowPrivateAccess = "true"))
-	bool bIsDead = false;
-	
+public:
+	UFUNCTION(BlueprintPure)
+	float GetHealthPercent() const;
 };

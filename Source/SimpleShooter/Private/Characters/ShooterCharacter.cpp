@@ -7,6 +7,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GameMode/SimpleShooterGameMode.h"
 #include "Items/Weapon/Weapon.h"
 #include "Particles/ParticleSystem.h"
 
@@ -34,6 +35,11 @@ void AShooterCharacter::SetupPlayerController()
 	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 			Subsystem->AddMappingContext(ShooterContext, 0);
+}
+
+float AShooterCharacter::GetHealthPercent() const
+{
+	return Health/MaxHealth;
 }
 
 // Called when the game starts or when spawned
@@ -132,9 +138,13 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 void AShooterCharacter::Die()
 {
 	bIsDead = true;
-	DetachFromControllerPendingDestroy();
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	SetLifeSpan(5.f);
+	ASimpleShooterGameMode* GameMode = GetWorld()->GetAuthGameMode<ASimpleShooterGameMode>();
+
+	if (GameMode)
+		GameMode->PawnKilled(this);
+
+	DetachFromControllerPendingDestroy();
 }
 
 void AShooterCharacter::HandleDamage(float DamageApplied)

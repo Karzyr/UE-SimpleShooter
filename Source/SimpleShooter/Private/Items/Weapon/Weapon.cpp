@@ -35,45 +35,57 @@ void AWeapon::Tick(float DeltaTime)
 
 }
 
+bool AWeapon::LineTraceSetup(UWorld* World, AController*& OwnerController, FRotator& CameraRotation, FHitResult& OutHit)
+{
+	APawn* OwnerPawn = Cast<APawn>(GetOwner());
+	if (OwnerPawn == nullptr) return false;
+
+	OwnerController = OwnerPawn->GetController();
+	if (OwnerController == nullptr) return false;
+
+	FVector CameraLocation;
+	OwnerController->GetPlayerViewPoint(CameraLocation, CameraRotation);
+
+	const FVector Start = CameraLocation;
+	const FVector End = CameraLocation + CameraRotation.Vector() * MaxFiringRange;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	Params.AddIgnoredActor(GetOwner());
+	return World->LineTraceSingleByChannel(OutHit, Start, End, ECC_GameTraceChannel1, Params);
+}
+
+void AWeapon::HitActor(UWorld* World, AController* OwnerController, FRotator CameraRotation, FHitResult OutHit)
+{
+	FVector ImpactEffectDirection = -CameraRotation.Vector();
+	AActor* HitActor = OutHit.GetActor();
+	if (HitActor)
+	{
+		FPointDamageEvent DamageEvent(Damage, OutHit, ImpactEffectDirection, nullptr);
+		HitActor->TakeDamage(Damage, DamageEvent, OwnerController, this);
+	}
+			
+	if (ImpactEffect)		
+		UGameplayStatics::SpawnEmitterAtLocation(World, ImpactEffect, OutHit.ImpactPoint, ImpactEffectDirection.Rotation());
+
+	if (ImpactSound)
+		UGameplayStatics::PlaySoundAtLocation(World, ImpactSound, OutHit.ImpactPoint, ImpactEffectDirection.Rotation());
+}
+
 void AWeapon::PullTrigger()
 {
 	UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, WeaponMeshComponent, FName("MuzzleFlashSocket"));
-
-	APawn* OwnerPawn = Cast<APawn>(GetOwner());
-	if (OwnerPawn == nullptr) return;
-	
-	AController* OwnerController = OwnerPawn->GetController();
-	if (OwnerController == nullptr) return;
-
-	FVector CameraLocation;
-	FRotator CameraRotation;
-	OwnerController->GetPlayerViewPoint(CameraLocation, CameraRotation);
+	UGameplayStatics::SpawnSoundAttached(MuzzleSound, WeaponMeshComponent, FName("MuzzleFlashSocket"));
 	
 	UWorld* World = GetWorld();
 	if (World)
 	{
+		AController* OwnerController;
+		FRotator CameraRotation;
 		FHitResult OutHit;
-
-		const FVector Start = CameraLocation;
-		const FVector End = CameraLocation + CameraRotation.Vector() * MaxFiringRange;
-		FCollisionQueryParams Params;
-		Params.AddIgnoredActor(this);
-		Params.AddIgnoredActor(GetOwner());
-		bool bHit = World->LineTraceSingleByChannel(OutHit, Start, End, ECC_GameTraceChannel1, Params);
-
-		if (bHit)
+		if (LineTraceSetup(World, OwnerController, CameraRotation, OutHit))
 		{
-			FVector ImpactEffectDirection = -CameraRotation.Vector();
-			if (ImpactEffect)		
-				UGameplayStatics::SpawnEmitterAtLocation(World, ImpactEffect, OutHit.ImpactPoint, ImpactEffectDirection.Rotation());
-
-			AActor* HitActor = OutHit.GetActor();
-			if (HitActor)
-			{
-				FPointDamageEvent DamageEvent(Damage, OutHit, ImpactEffectDirection, nullptr);
-				HitActor->TakeDamage(Damage, DamageEvent, OwnerController, this);
-			}
-		}
+			HitActor(World, OwnerController, CameraRotation, OutHit);
+		}		
 	}
 }
 
